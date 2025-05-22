@@ -15,13 +15,75 @@ fixed_repo_name = st.text_input("📁 Fixed Repo Name")
 
 run_button = st.button("🚀 Run Code Fixing Pipeline")
 
+def get_prompt(language, filename, content):
+    if language == "c":
+        return f"""
+You are an AI code assistant. Below is a C source code file extracted from the zlib GitHub repository.
+The code may contain:
+- Compilation errors
+- Logical bugs  
+- Deprecated K&R-style function definitions (pre-ANSI C)
+- Bad programming practices
+- Outdated or unsafe constructs (e.g., unsafe memory usage, missing prototypes)
+
+Your task:
+1. Analyze the C code carefully.
+2. Identify and **explain all the bugs, including deprecated K&R-style function definitions**.
+3. **Fix all issues** and provide a **fully corrected and compilable version** of the code.
+4. Update the function definitions to **modern C standards** (C99 or later), replacing K&R-style syntax with ANSI C-compliant prototypes.
+5. Ensure the code follows **safe, maintainable, and modular programming practices**.
+6. Keep the **filename at the top**.
+
+File: {filename}
+"""
+    elif language == "cpp":
+        return f"""
+You are an AI code assistant. Below is a C++ source code file extracted from the zlib GitHub repository.
+The code may contain:
+- Compilation errors
+- Logical or runtime bugs
+- Deprecated C-style or K&R-style function definitions (common in legacy C++ code)
+- Outdated programming practices or legacy constructs
+- Poor memory and resource management
+
+Your task:
+1. Analyze the C++ code thoroughly.
+2. Identify and **explain all bugs and outdated practices, including any K&R-style or non-idiomatic function definitions**.
+3. **Fix all identified issues** and provide a **fully corrected and compilable version** of the code.
+4. Refactor the code using **modern C++ standards (C++11 and later)** with best practices such as:
+   - Using smart pointers
+   - Avoiding raw memory manipulation
+   - Prefer STL containers and idiomatic code patterns
+5. Keep the **filename at the top**.
+
+File: {filename}
+"""
+    else:
+        return f"""
+You are an AI code assistant. Below is a Java source code file extracted from a GitHub repository.
+The code may contain:
+- Compilation errors
+- Logical bugs
+- Bad programming practices
+- Outdated constructs
+
+Your task:
+1. Analyze the Java code carefully.
+2. Identify and **explain all the errors or bugs found** in the code.
+3. **Fix all issues** and provide a **fully corrected and functional version of the Java code**.
+4. The fixed code should follow **modern Java best practices** and be ready to compile.
+5. Keep the **filename at the top**.
+
+File: {filename}
+"""
+
 if run_button:
-    output = ""
-    
+    logs = []
+    log_placeholder = st.empty()
+
     def log(msg):
-        global output
-        output += msg + "\n"
-        st.code(output)
+        logs.append(msg)
+        log_placeholder.text('\n'.join(logs))
 
     os.environ["GITHUB_TOKEN"] = "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"  # Replace with a secure secret method
     GITHUB_USERNAME = "Kasi-Vishwanathan"
@@ -54,14 +116,6 @@ if run_button:
     os.chdir(fixed_repo_name)
     subprocess.run(["git","config","user.name","LLM Code Bot"])
     subprocess.run(["git","config","user.email","llm@code.bot"])
-
-    def get_prompt(language, filename, content):
-        if language == "c":
-            return f"""File: {filename}\nFix the C code below for modern standards:\n{content}"""
-        elif language == "cpp":
-            return f"""File: {filename}\nFix the C++ code below for modern standards:\n{content}"""
-        else:
-            return f"""File: {filename}\nFix the Java code below for modern standards:\n{content}"""
 
     vectorizer = TfidfVectorizer()
     memory_chunks, memory_fixes = [], []
