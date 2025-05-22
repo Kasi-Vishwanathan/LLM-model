@@ -78,12 +78,12 @@ File: {filename}
 """
 
 if run_button:
-    logs = []
-    log_placeholder = st.empty()
-
+    output = ""
+    
     def log(msg):
-        logs.append(msg)
-        log_placeholder.text('\n'.join(logs))
+        global output
+        output += msg + "\n"
+        st.code(output)
 
     os.environ["GITHUB_TOKEN"] = "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"  # Replace with a secure secret method
     GITHUB_USERNAME = "Kasi-Vishwanathan"
@@ -202,3 +202,4 @@ if run_button:
     log(f"\n🚀 Pushing to {remote_url}")
     subprocess.run(["git","push", remote_url,"main"])
     log("\n🎯 All fixed + original chunks merged, RAG memory saved in Firebase!")
+
