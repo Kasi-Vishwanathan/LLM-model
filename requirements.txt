@@ -1,0 +1,11 @@
+streamlit
+firebase-admin
+scikit-learn
+requests
+json
+requests
+re
+glob
+shutil
+sklearn.feature_extraction.text 
+sklearn.metrics.pairwise 
