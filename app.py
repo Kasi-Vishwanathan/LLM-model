@@ -19,7 +19,7 @@ if run_button:
     output = ""
     
     def log(msg):
-        nonlocal output
+        global output
         output += msg + "\n"
         st.code(output)
 
